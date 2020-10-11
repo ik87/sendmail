@@ -50,7 +50,6 @@ public class Email {
     public void send(byte[] is, String emailTo) throws EmailException {
         init();
         this.email.addTo(emailTo);
-        this.email.addReplyTo(emailFrom, "some@mail.ru");
         var source = new ByteArrayDataSource(is, "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
         //  add the attachment
         this.email.attach(source, emailAttachFile, emailAttachDecrFile);

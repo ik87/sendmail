@@ -1,5 +1,6 @@
 package ru.ik87;
 
+import org.apache.commons.mail.EmailException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
@@ -22,7 +23,7 @@ public class Program {
         Config emailConfig = new Config("email.properties");
         String tableXlsxFIle = mainConfig.getProperties().getProperty("tableXlsxFIle");
         String templateDocxFIle = mainConfig.getProperties().getProperty("templateDocxFIle");
-        ExecutorService pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+        //ExecutorService pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
         SaveLocal saveLocal = new SaveLocal();
         String state = mainConfig.getProperties().getProperty("state");
         Email email = new Email(emailConfig.getProperties());
@@ -37,15 +38,15 @@ public class Program {
                 if (!row.isEmpty()) {
                     byte[] doc = replaceText.composeDocx(row);
                     if (row.get(state) == null) {
-                       // email.send(doc, row.get(email_col));
-                        saveLocal.save(doc, row.get(email_col) );
+                        email.send(doc, row.get(email_col));
+                        //saveLocal.save(doc, row.get(email_col) );
                         System.out.println(row.get(email_col) + " отправленно");
-                        tableXlsx.writeXlsx(i, state, "отправленно");
+                        //tableXlsx.writeXlsx(i, state, "отправленно");
                     }
                 }
                 i++;
             }
-        } catch (IOException | InvalidFormatException /*| EmailException */e) {
+        } catch (IOException | InvalidFormatException | EmailException e) {
             LOGGER.error(e.getMessage());
         }
         System.out.println("Отправка завершена");
