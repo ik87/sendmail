@@ -5,19 +5,22 @@ import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.xwpf.usermodel.*;
 
 import java.io.*;
+import java.nio.file.Files;
+
 import java.util.List;
 import java.util.Map;
 
 public class ReplaceText {
-    private final String template;
+    private final byte[] template;
 
-    public ReplaceText(String templateDocxFile) {
-        this.template = templateDocxFile;
+    public ReplaceText(String templateDocxFile) throws IOException {
+        File file = new File(templateDocxFile);
+        this.template =  Files.readAllBytes(file.toPath());
     }
 
-    public byte[] composeDocx(Map<String, String> variables) throws IOException {
-        FileInputStream fis = new FileInputStream(new File(template));
-        XWPFDocument doc = new XWPFDocument(fis);
+    public byte[] generateFromTemplate(Map<String, String> variables) throws IOException {
+        InputStream bis = new ByteArrayInputStream(template);
+        XWPFDocument doc = new XWPFDocument(bis);
         for (XWPFParagraph p : doc.getParagraphs()) {
             List<XWPFRun> runs = p.getRuns();
             if (runs != null) {
@@ -38,7 +41,7 @@ public class ReplaceText {
             }
         }
 
-        fis.close();
+        bis.close();
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
         doc.write(buffer);
         byte[] bytes = buffer.toByteArray();
